@@ -5,25 +5,29 @@
 
 from funciones import simbolosDirectrices
 
-# Terminales
-abre_parentesis = '('
-cierra_parentesis = ')'
-a = 'a'
-VT = [a, abre_parentesis, cierra_parentesis]
+id = 'id'
+int = 'int'
+float = 'float'
+pyc = 'pyc'
 
-# No terminales
-S = 'S'
-B = 'B'
-VN = [S, B]
+D = 'D'
+T = 'T'
+L = 'L'
+M = 'M'
+λ = 'λ'
 
-# Producciones
+VT = [id, int, float, pyc, λ]
+VN = [D, T, L, M]
 P = {
-  S: [[abre_parentesis, B, cierra_parentesis], [a]],
-  B: [S]
+  'D': [[T, L]],
+  'T': [[int], [float]],
+  'L': [[id, M]],
+  'M': [[pyc, L], [λ]],
 }
+# D -> L -> id M -> id λ
 
 # Cadena de entrada
-cadena = 'a'
+cadena = [int, id, pyc, id, λ]
 
 # Gloriosa programacion orientada a objetos
 class Error:
@@ -70,6 +74,13 @@ def main(w):
 
     error.desactivar()
     t = puntero.obtener()
+
+    # Esta condicion fue agregada ya que en el caso
+    # cadena = [int, id, pyc, id] teniamos la excepcion IndexError en simboloApuntado = w[t]
+    if t >= len(w):
+      error.activar()
+      return 
+    
     simboloApuntado = w[t]
     # simbolosDirectricesGramatica.get(VN) devuelve los directrices de cada derivacion de VN
     # sd es el simbolo directriz
@@ -107,7 +118,7 @@ def main(w):
       
 
 
-  PNI(S)
+  PNI(D)
   if not error.obtener() and fin_de_cadena(w):
     print('Cadena aceptada')
   else:
