@@ -4,32 +4,21 @@
 """
 
 from funciones import simbolosDirectrices
+from automatas import sino, si, entonces, func, finfunc, finsi, repetir, hasta, equal, leer, mostrar, parentesisI, parentesisD, id, num, oprel, opsuma, opmult, pyc
+from gramaticas import gramatica, gramaticaSTR
 
-id = 'id'
-int = 'int'
-float = 'float'
-pyc = 'pyc'
 
-D = 'D'
-T = 'T'
-L = 'L'
-M = 'M'
-λ = 'λ'
-
-VT = [id, int, float, pyc, λ]
-VN = [D, T, L, M]
-P = {
-  'D': [[T, L]],
-  'T': [[int], [float]],
-  'L': [[id, M]],
-  'M': [[pyc, L], [λ]],
-}
-# D -> L -> id M -> id λ
+VT = gramaticaSTR['T']
+VN = gramaticaSTR['N']
+P = gramaticaSTR['P']
+S = gramaticaSTR['S']
 
 # Cadena de entrada
-cadena = [int, id, pyc, id, λ]
+cadena = ['id' 'equal', 'num', 'opmult', '(', 'num', 'opmsuma', 'num', ')']
 
 # Gloriosa programacion orientada a objetos
+
+
 class Error:
   def __init__(self):
     self.__error = False
@@ -39,10 +28,11 @@ class Error:
 
   def desactivar(self):
     self.__error = False
-  
+
   def obtener(self):
     return self.__error
-  
+
+
 class Puntero:
   def __init__(self):
     self.__t = 0  # Puntero de la cadena de entrada
@@ -53,14 +43,15 @@ class Puntero:
   def obtener(self):
     return self.__t
 
+
 def main(w):
   # Definimos los objetos globales transversales a los procedimientos
   error = Error()
   puntero = Puntero()
   simbolosDirectricesGramatica = simbolosDirectrices({
-    'P': P,
-    'T': VT,
-    'N': VN
+      'P': P,
+      'T': VT,
+      'N': VN
   })
   print(simbolosDirectricesGramatica)
 
@@ -79,8 +70,8 @@ def main(w):
     # cadena = [int, id, pyc, id] teniamos la excepcion IndexError en simboloApuntado = w[t]
     if t >= len(w):
       error.activar()
-      return 
-    
+      return
+
     simboloApuntado = w[t]
     # simbolosDirectricesGramatica.get(VN) devuelve los directrices de cada derivacion de VN
     # sd es el simbolo directriz
@@ -95,7 +86,6 @@ def main(w):
         procesar(derivacionQueFunciona)
         break
 
-
   def procesar(produccion):
     for j in range(0, len(produccion)):
       t = puntero.obtener()
@@ -103,7 +93,7 @@ def main(w):
       xj = produccion[j]
       # Si es un terminal
       if xj in VT:
-       
+
         if t < len(w) and w[t] == xj:  # t < len(w) para evitar IndexError
           puntero.avanzar()
         else:
@@ -111,19 +101,17 @@ def main(w):
           break
       # Si es un no terminal
       if xj in VN:
-        
+
         PNI(xj)
         if error.obtener():
           break
-      
 
-
-  PNI(D)
+  PNI(S)
   if not error.obtener() and fin_de_cadena(w):
     print('Cadena aceptada')
   else:
     print('Cadena rechazada')
-  
+
 
 main(cadena)
 
