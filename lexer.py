@@ -117,6 +117,8 @@ def lexer(cadena):
       # Se avanza en la cadena principal
       i = j
     # else: hay tokens vivos que todavían no aceptan la subcadena, en cuyo caso se sigue intentando en la próxima iteración
+  # Añadimos el símbolo de fin de cadena
+  lista_duplas.append(('$', '$'))
 
   print('USUARIO: Acá tenés, ' + str(propina) + '. Disfrutalo gil.' + '\nHANNIBAL LEXER: ' + str(advertencias) + '. Estás advertido.')
   return lista_duplas

@@ -1,6 +1,7 @@
 from Parser import simbolosDirectrices, cadenizacion, primeros, siguientes, λ
 from automatas import sino, si, entonces, func, finfunc, finsi, repetir, hasta, equal, leer, mostrar, parentesisI, parentesisD, id, num, oprel, opsuma, opmult, pyc
 from gramaticas import gramatica, gramaticaSTR
+from lexer import lexer
 
 VN = gramaticaSTR['N']
 
@@ -56,7 +57,7 @@ def desc_rec_proc(codigo_fuente):
     def principal():
         pni(gramatica['S'])
         caracter_actual = datos_locales['lista_tokens'][datos_locales['index']][0]
-        if caracter_actual != 'Eof' or datos_locales['error']:
+        if caracter_actual != '$' or datos_locales['error']:
             print('La cadena no pertenece al lenguaje')
             return False
         print('La cadena pertenece al lenguaje')
@@ -64,4 +65,6 @@ def desc_rec_proc(codigo_fuente):
     
     return principal()
 
-print(desc_rec_proc([('variable', 'id'), ('igual', 'equal'), ('5', 'num'), ('Eof', 'Eof')]))
+
+cadena = 'variable .  igual  :sinco'
+print(desc_rec_proc(lexer(cadena)))
