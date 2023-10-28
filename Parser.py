@@ -103,15 +103,15 @@ def simbolosDirectrices(gramatica):
   simbolosDirectrices = {}
   # Para cada producción (A -> β0γ | β1δ | ...) de la gramática, con βi ∈ (T U N)
   for produccion in gramatica['P']:
-    simbolosDirectrices[produccion] = Ø
+    simbolosDirectrices[produccion] = []
     # Para cada derivación βiα de la producción
     for derivacion in gramatica['P'][produccion]:
       βi = cadenizacion(derivacion[0])
       # Si βi no es anulable, SD(producción) = primeros(βi)
-      simbolosDirectrices[produccion] = (simbolosDirectrices[produccion]).union(primeros(gramatica)[βi])
+      (simbolosDirectrices[produccion]).append(primeros(gramatica)[βi])
       # Si βi es anulable, SD(producción) = primeros(βi) U siguientes(βi)
       if anulable(βi, gramatica):
-        simbolosDirectrices[produccion] = (simbolosDirectrices[produccion]).union(siguientes(gramatica)[βi])
+        (simbolosDirectrices[produccion]).append(siguientes(gramatica)[βi])
   return simbolosDirectrices
 
 
@@ -123,9 +123,9 @@ def esLL1(gramatica):
     i = 0
     n = len(simbolos[produccion]) - 1
     while i < n:
-      SDβi = list(simbolos[produccion])[i]
+      SDβi = simbolos[produccion][i]
       for j in [k for k in range(i + 1, n + 1) if k != i]:
-        SDβj = list(simbolos[produccion])[j]
+        SDβj = simbolos[produccion][j]
         # Si SD(βi) ∩ SD(βj) != Ø
         if set(SDβi).intersection(set(SDβj)) != Ø:
           # La gramática no es LL(1)
