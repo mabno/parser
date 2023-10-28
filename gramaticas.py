@@ -119,7 +119,7 @@ gramatica = {
         'ListaPar': [[id, "ListaPar'"]],
         "ListaPar'": [[λ], [pyc, id, "ListaPar'"]],
         'Expresion': [["Expresion'", 'Expresion2']],
-        "Expresion'": [[λ], ['oprel', 'Expresion2']],
+        "Expresion'": [[λ], [oprel, 'Expresion2']],
         'Expresion2': [['Termino', "Expresion2'"]],
         "Expresion2'": [[λ], [opsuma, 'Termino']],
         'Termino': [['Factor', "Termino'"]],
