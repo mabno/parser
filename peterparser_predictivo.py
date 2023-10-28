@@ -3,22 +3,15 @@
   Esta version es predictiva ya que se tienen los simbolos directrices de las producciones de la gramatica
 """
 
-from funciones import simbolosDirectrices
+from Parser import simbolosDirectrices, cadenizacion, primeros, siguientes, λ
 from automatas import sino, si, entonces, func, finfunc, finsi, repetir, hasta, equal, leer, mostrar, parentesisI, parentesisD, id, num, oprel, opsuma, opmult, pyc
 from gramaticas import gramatica, gramaticaSTR
 
 
-VT = gramaticaSTR['T']
-VN = gramaticaSTR['N']
-P = gramaticaSTR['P']
-S = gramaticaSTR['S']
-
 # Cadena de entrada
-cadena = ['id' 'equal', 'num', 'opmult', '(', 'num', 'opmsuma', 'num', ')']
+cadena = [id, equal, num, opmult, parentesisI, num, opsuma, num, parentesisD]
 
 # Gloriosa programacion orientada a objetos
-
-
 class Error:
   def __init__(self):
     self.__error = False
@@ -44,35 +37,32 @@ class Puntero:
     return self.__t
 
 
-def main(w):
+def main(cadena, gramatica):
   # Definimos los objetos globales transversales a los procedimientos
   error = Error()
   puntero = Puntero()
-  simbolosDirectricesGramatica = simbolosDirectrices({
-      'P': P,
-      'T': VT,
-      'N': VN
-  })
+  simbolosDirectricesGramatica = simbolosDirectrices(gramatica)
   print(simbolosDirectricesGramatica)
 
   # Comprueba que el puntero ya este "apuntando" al fin de la cadena
-  def fin_de_cadena(w):
-    return puntero.obtener() == len(w)
+  def fin_de_cadena(cadena):
+    return puntero.obtener() == len(cadena)
 
-  def PNI(VN):
-    # Obtiene en que puede derivar VN
-    derivaciones = P.get(VN)
+  def PNI(noTerminal):
+    derivaciones = []
+    # Obtiene en que puede derivar el no terminal
+    derivaciones = gramatica['P'][noTerminal]
 
     error.desactivar()
     t = puntero.obtener()
 
     # Esta condicion fue agregada ya que en el caso
     # cadena = [int, id, pyc, id] teniamos la excepcion IndexError en simboloApuntado = w[t]
-    if t >= len(w):
+    if t >= len(cadena):
       error.activar()
       return
 
-    simboloApuntado = w[t]
+    simboloApuntado = cadena[t]
     # simbolosDirectricesGramatica.get(VN) devuelve los directrices de cada derivacion de VN
     # sd es el simbolo directriz
     # i es el indice de la derivacion a la cual pertenece el simbolo directriz
@@ -80,9 +70,9 @@ def main(w):
     # S -> (B) | a
     # simbolos directrices de S: ['(', 'a']
     # si simboloApuntado es '(' entonces i = 0 ya que '(' pertenece a la primera derivacion
-    for i, sd in enumerate(simbolosDirectricesGramatica.get(VN)):
-      if simboloApuntado in sd:
-        derivacionQueFunciona = derivaciones[i]
+    for i, sd in enumerate(simbolosDirectricesGramatica.keys()):
+      if cadenizacion(simboloApuntado) == sd:
+        derivacionQueFunciona = cadenizacion(derivaciones[i])
         procesar(derivacionQueFunciona)
         break
 
@@ -92,28 +82,28 @@ def main(w):
       # Obtengo el simbolo de la produccion en la posicion j
       xj = produccion[j]
       # Si es un terminal
-      if xj in VT:
+      if xj in gramatica['T']:
 
-        if t < len(w) and w[t] == xj:  # t < len(w) para evitar IndexError
+        if t < len(cadena) and cadenizacion(cadena[t]) == cadenizacion(xj):  # t < len(w) para evitar IndexError
           puntero.avanzar()
         else:
           error.activar()
           break
       # Si es un no terminal
-      if xj in VN:
+      if xj in gramatica['N']:
 
         PNI(xj)
         if error.obtener():
           break
 
-  PNI(S)
-  if not error.obtener() and fin_de_cadena(w):
+  PNI(gramatica['S'])
+  if not error.obtener() and fin_de_cadena(cadena):
     print('Cadena aceptada')
   else:
     print('Cadena rechazada')
 
 
-main(cadena)
+main(cadena, gramatica)
 
 '''
       __                                                      

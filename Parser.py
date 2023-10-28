@@ -4,8 +4,18 @@ from gramaticas import gramatica, gramaticaSTR
 
 # Conjunto vacío
 Ø = set([])
-# Cadena vacía (lamdita)
+# cadenizacion vacía (lamdita)
 λ = ""
+
+
+# Función auxiliar que devuelve la cadenizacion asociada a un terminal, o un no terminal
+def cadenizacion(simbolo):
+  # Si el símbolo es una cadenizacion, devuelve la misma
+  if isinstance(simbolo, str):
+    return simbolo
+  else:
+    # Si es un terminal en su forma canónica, le asigna su valor clave
+    return simbolo[5]
 
 
 # Función que devuelve un diccionario con los primeros de cada símbolo
@@ -16,7 +26,7 @@ def primeros(gramatica):
   primerosAux = {λ: Ø}
   # Para cada terminal, se agrega al mismo terminal al conjunto de primeros
   for terminal in gramatica['T']:
-    primeros[terminal] = {terminal}
+    primeros[cadenizacion(terminal)] = {cadenizacion(terminal)}
   # Para cada no terminal, se crea un conjunto vacío de primeros
   for noTerminal in gramatica['N']:
     primeros[noTerminal] = Ø
@@ -30,14 +40,14 @@ def primeros(gramatica):
         k = len(derivacion) - 1
         # primeros(A) = primeros(A) U (primeros(β0) - {λ})
         primeros[produccion] = primeros[produccion].union(
-            primeros[derivacion[0]].difference({λ}))
+            primeros[cadenizacion(derivacion[0])].difference({λ}))
         i = 0
-        while λ in primeros[derivacion[i]] and i < k:
+        while λ in primeros[cadenizacion(derivacion[i])] and i < k:
           # primeros(A) = primeros(A) U (primeros(β(i + 1)) - {λ})
           primeros[produccion] = primeros[produccion].union(
-              primeros[derivacion[i + 1]].difference({λ}))
+              primeros[cadenizacion(derivacion[i + 1])].difference({λ}))
           i += 1
-        if i == k and λ in primeros[derivacion[k]]:
+        if i == k and λ in primeros[cadenizacion(derivacion[k])]:
           # primeros(A) = primeros(A) U {λ}
           primeros[produccion] = primeros[produccion].union({λ})
   return primeros
@@ -52,11 +62,11 @@ def siguientes(gramatica):
   # Para cada no terminal, se crea una lista vacía de siguientes
   for noTerminal in gramatica['N']:
     siguientes[noTerminal] = Ø
-  # Se agrega el símbolo de "fin de cadena" a los siguientes del símbolo distinguido
+  # Se agrega el símbolo de "fin de cadenizacion" a los siguientes del símbolo distinguido
   siguientes[gramatica['S']] = ['#']
   # Para cada terminal, se crea un conjunto vacío de siguientes (no está en el libro, pero el código no funciona sin esto)
   for terminal in gramatica['T']:
-    siguientes[terminal] = Ø
+    siguientes[cadenizacion(terminal)] = Ø
   # Mientras hayan cambios en siguientes
   while siguientes != siguientesAux:
     siguientesAux = siguientes.copy()
@@ -66,18 +76,17 @@ def siguientes(gramatica):
       for derivacion in gramatica['P'][produccion]:
         k = len(derivacion) - 1
         # siguientes(βk) = siguientes(βk) U siguientes(A)
-        siguientes[derivacion[k]] = siguientes[derivacion[k]].union(
+        siguientes[cadenizacion(derivacion[k])] = siguientes[cadenizacion(derivacion[k])].union(
             siguientes[produccion])
         trailer = siguientes[produccion].copy()
         for i in range(k, 0, -1):
-          if λ in siguientes[derivacion[i]]:
+          if λ in siguientes[cadenizacion(derivacion[i])]:
             # siguientes(β(i-1)) = siguientes(β(i-1)) U (primeros(βi) - {λ}) U trailer
-            siguientes[derivacion[i - 1]] = (siguientes[derivacion[i - 1]].union(
-                primeros(gramatica)[derivacion[i]].difference({λ}))).union(trailer)
+            siguientes[cadenizacion(derivacion[i - 1])] = (siguientes[cadenizacion(derivacion[i - 1])].union(
+                primeros(gramatica)[cadenizacion(derivacion[i])].difference({λ}))).union(trailer)
           else:
             # siguientes(β(i-1)) = siguientes(β(i-1)) U primeros(βi)
-            siguientes[derivacion[i - 1]] = siguientes[derivacion[i - 1]
-                                                       ].union(primeros(gramatica)[derivacion[i]])
+            siguientes[cadenizacion(derivacion[i - 1])] = siguientes[cadenizacion(derivacion[i - 1])].union(primeros(gramatica)[cadenizacion(derivacion[i])])
             trailer = Ø
   return siguientes
 
@@ -94,15 +103,15 @@ def simbolosDirectrices(gramatica):
   simbolosDirectrices = {}
   # Para cada producción (A -> β0γ | β1δ | ...) de la gramática, con βi ∈ (T U N)
   for produccion in gramatica['P']:
-    simbolosDirectrices[produccion] = []
+    simbolosDirectrices[produccion] = Ø
     # Para cada derivación βiα de la producción
     for derivacion in gramatica['P'][produccion]:
-      βi = derivacion[0]
+      βi = cadenizacion(derivacion[0])
       # Si βi no es anulable, SD(producción) = primeros(βi)
-      (simbolosDirectrices[produccion]).append(primeros(gramatica)[βi])
+      simbolosDirectrices[produccion] = (simbolosDirectrices[produccion]).union(primeros(gramatica)[βi])
       # Si βi es anulable, SD(producción) = primeros(βi) U siguientes(βi)
       if anulable(βi, gramatica):
-        (simbolosDirectrices[produccion]).append(siguientes(gramatica)[βi])
+        simbolosDirectrices[produccion] = (simbolosDirectrices[produccion]).union(siguientes(gramatica)[βi])
   return simbolosDirectrices
 
 
@@ -114,11 +123,11 @@ def esLL1(gramatica):
     i = 0
     n = len(simbolos[produccion]) - 1
     while i < n:
-      SDβi = simbolos[produccion][i]
+      SDβi = list(simbolos[produccion])[i]
       for j in [k for k in range(i + 1, n + 1) if k != i]:
-        SDβj = simbolos[produccion][j]
+        SDβj = list(simbolos[produccion])[j]
         # Si SD(βi) ∩ SD(βj) != Ø
-        if SDβi.intersection(SDβj) != Ø:
+        if set(SDβi).intersection(set(SDβj)) != Ø:
           # La gramática no es LL(1)
           return False
       i += 1
@@ -129,11 +138,11 @@ def esLL1(gramatica):
 
 print('Gramatica posta')
 print('Primeros')
-print(primeros(gramaticaSTR))
+print(primeros(gramatica))
 print('Siguientes')
-print(siguientes(gramaticaSTR))
+print(siguientes(gramatica))
 print('Simbolos directrices')
-print(simbolosDirectrices(gramaticaSTR))
+print(simbolosDirectrices(gramatica))
 print('Es LL(1)')
-print(esLL1(gramaticaSTR))
+print(esLL1(gramatica))
 print()

@@ -12,7 +12,7 @@ def primeros(gramatica):
   primerosAux = {λ: Ø}
   # Para cada terminal, se agrega al mismo terminal al conjunto de primeros
   for terminal in gramatica['T']:
-    primeros[terminal] = {terminal}
+    primeros[terminal[5]] = {terminal}
   # Para cada no terminal, se crea un conjunto vacío de primeros
   for noTerminal in gramatica['N']:
     primeros[noTerminal] = Ø
@@ -50,7 +50,7 @@ def siguientes(gramatica):
   siguientes[gramatica['S']] = ['#']
   # Para cada terminal, se crea un conjunto vacío de siguientes (no está en el libro, pero el código no funciona sin esto)
   for terminal in gramatica['T']:
-    siguientes[terminal] = Ø
+    siguientes[terminal[5]] = Ø
   # Mientras hayan cambios en siguientes
   while siguientes != siguientesAux:
     siguientesAux = siguientes.copy()
