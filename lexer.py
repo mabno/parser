@@ -118,14 +118,14 @@ def lexer(cadena):
       i = j
     # else: hay tokens vivos que todavían no aceptan la subcadena, en cuyo caso se sigue intentando en la próxima iteración
   # Añadimos el símbolo de fin de cadena
-  lista_duplas.append(('$', '$'))
+  lista_duplas.append(('#', '#'))
 
   print('USUARIO: Acá tenés, ' + str(propina) + '. Disfrutalo gil.' + '\nHANNIBAL LEXER: ' + str(advertencias) + '. Estás advertido.')
   return lista_duplas
 
+'''
 
 lista = lexer('Acá se pone cualquier cosa y Lexer cumple con su cometido')
-
 
 # Casos de prueba
 print(funcionTransicion(func, 'f', 'q1'))
@@ -142,3 +142,5 @@ print(lexer('Función Mover:\n  Hacer L igual a Clausura-λ({x en f(t,a): t pert
 print(lexer("Algoritmo de pasaje de AEFND-λ a AEFD:\nQ0 iqual Clausura-λ({q0})\nK egual {Q0} donde K' es marcable y Q0 está sin marcar\nMientras haya T en K' sin marcar\n  Marcar T\n  Para cada a en I hacer\n    U iqual Mover(T, a)\n    Si U no está en K' entonces\n      Agregar U a K' sin marcar\n    f'(T,a) equal U\nHacer F' egual {x en K: x no aceptado}"))
 print(lexer('func: leer y; x equal 1; Repetir (1+x) hasta que x>=y; Mostrar el resultado; finfuncion'))
 print(lexer("Algoritmo de minimización de AFD: Fin equal Falso;\nk equal 0;\nSi Fin == Falso entonces repetir(\n  P equal conjunto de conjuntos de estados k- equivalentes;\n  P' equal conjunto de conjuntos de estados (k+1) equivalentes;\n  Si P != P' entonces\n    P equal P';\n    k equal k+1;\n  Sino\n    Fin equal Verdadero;\n  Finsi;)\nFinsi;\nRetornar P'"))
+
+'''

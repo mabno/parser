@@ -104,7 +104,7 @@ gramatica = {
     # Producciones
     'P': {
         'Program': [['ListaSentencias']],
-        'ListaSentencias': [['Sentencia', "ListaSentencias'"]],
+        'ListaSentencias': [[λ], ['Sentencia', "ListaSentencias'"]],
         "ListaSentencias'": [[λ], [pyc, 'Sentencia']],
         'Sentencia': [['SentenciaSi'], ['SentenciaFun'], ['SentenciaAsig'], ['SentenciaLeer'], ['SentenciaMostrar']],
         'SentenciaSi': [["SentenciaSi'", 'ListaSentencias', finsi]],
@@ -118,7 +118,7 @@ gramatica = {
         'Proc': [[id, parentesisI, 'ListaPar', parentesisD, 'ListaSentencias']],
         'ListaPar': [[id, "ListaPar'"]],
         "ListaPar'": [[λ], [pyc, id, "ListaPar'"]],
-        'Expresion': [["Expresion'", 'Expresion2']],
+        'Expresion': [['Expresion2', "Expresion'"]],
         "Expresion'": [[λ], [oprel, 'Expresion2']],
         'Expresion2': [['Termino', "Expresion2'"]],
         "Expresion2'": [[λ], [opsuma, 'Termino']],
@@ -155,7 +155,7 @@ gramaticaSTR = {
         'Proc': [['id', '(', 'ListaPar', ')', 'ListaSentencias']],
         'ListaPar': [['id', "ListaPar'"]],
         "ListaPar'": [[λ], [';', 'id', "ListaPar'"]],
-        'Expresion': [["Expresion'", 'Expresion2']],
+        'Expresion': [['Expresion2', "Expresion'"]],
         "Expresion'": [[λ], ['oprel', 'Expresion2']],
         'Expresion2': [['Termino', "Expresion2'"]],
         "Expresion2'": [[λ], ['opsuma', 'Termino']],
