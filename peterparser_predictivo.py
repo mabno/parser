@@ -1,15 +1,31 @@
-"""
-  Implementación procedural de analizadores sintácticos descendentes predictivo.
-  Esta version es predictiva ya que se tienen los simbolos directrices de las producciones de la gramatica
-"""
-
-from Parser import simbolosDirectrices, cadenizacion, primeros, siguientes, λ
-from automatas import sino, si, entonces, func, finfunc, finsi, repetir, hasta, equal, leer, mostrar, parentesisI, parentesisD, id, num, oprel, opsuma, opmult, pyc
-from gramaticas import gramatica, gramaticaSTR
+from funciones import simbolosDirectrices, cadenizacion
+from gramaticas import gramatica
+from lexer import lexer
 
 
-# Cadena de entrada
-cadena = [id, equal, num, opmult, parentesisI, num, opsuma, num, parentesisD]
+SD = {
+    'Program': [{'func', 'si', 'repetir', 'mostrar', 'id', 'leer'}],
+    'ListaSentencias': [{'id', 'si', 'leer', 'repetir', 'mostrar', 'func'}],
+    "ListaSentencias'": [{'#', 'sino', 'finsi', 'finfunc', 'hasta'}, {';'}],
+    'Sentencia': [{'si'}, {'func'}, {'id'}, {'leer'}, {'mostrar'}, {'repetir'}],
+    'SentenciaSi': [{'si'}],
+    "SentenciaSi'": [{'sino'}, {'finsi'}],
+    'SentenciaFun': [{'func'}],
+    'SentenciaAsig': [{'id'}],
+    'SentenciaLeer': [{'leer'}],
+    'SentenciaMostrar': [{'mostrar'}],
+    'SentenciaRepetir': [{'repetir'}],
+    'Proc': [{'id'}],
+    'ListaPar': [{'id'}],
+    "ListaPar'": [{')'}, {';'}],
+    'Expresion': [{'id', '(', 'num'}],
+    "Expresion'": [set(), {'oprel'}],
+    'Expresion2': [{'id', '(', 'num'}],
+    "Expresion2'": [{'oprel', 'pyc', 'finfunc', 'hasta', ')', '#', 'sino', 'entonces', 'finsi'}, {'opsuma'}],
+    'Termino': [{'num', 'id', '('}],
+    "Termino'": ['opsuma', 'oprel', 'pyc', 'finfunc', 'hasta', ')', '#', 'sino', 'entonces', 'finsi', {'opmult'}],
+    'Factor': [{'('}, {'id'}, {'num'}]}
+
 
 # Gloriosa programacion orientada a objetos
 class Error:
@@ -41,8 +57,7 @@ def main(cadena, gramatica):
   # Definimos los objetos globales transversales a los procedimientos
   error = Error()
   puntero = Puntero()
-  simbolosDirectricesGramatica = simbolosDirectrices(gramatica)
-  print(simbolosDirectricesGramatica)
+  simbolosDirectricesGramatica = SD
 
   # Comprueba que el puntero ya este "apuntando" al fin de la cadena
   def fin_de_cadena(cadena):
@@ -84,7 +99,8 @@ def main(cadena, gramatica):
       # Si es un terminal
       if xj in gramatica['T']:
 
-        if t < len(cadena) and cadenizacion(cadena[t]) == cadenizacion(xj):  # t < len(w) para evitar IndexError
+        # t < len(w) para evitar IndexError
+        if t < len(cadena) and cadenizacion(cadena[t]) == cadenizacion(xj):
           puntero.avanzar()
         else:
           error.activar()
@@ -98,48 +114,38 @@ def main(cadena, gramatica):
 
   PNI(gramatica['S'])
   if not error.obtener() and fin_de_cadena(cadena):
-    print('Cadena aceptada')
+    print('PETER PARSER: Cadena aceptada')
   else:
-    print('Cadena rechazada')
+    print('PETER PARSER: Cadena rechazada. No se puede derivar en el terminal "' +
+          str(lista[puntero.obtener()]) + '" de la posición ' + str(puntero.obtener()) + '.')
 
 
-main(cadena, gramatica)
+# Pruebas
 
-'''
-      __                                                      
-     /  l                                                     
-   .'   :               __.....__..._  ____                   
-  /  /   \          _.-"        "-.  ""    "-.                
- (`-: .---:    .--.'          _....J.         "-.             
-  """y     \,.'    \  __..--""       `+""--.     `.           
-    :     .'/    .-"""-. _.            `.   "-.    `._.._     
-    ;  _.'.'  .-j       `.               \     "-.   "-._`.   
-    :    / .-" :          \  `-.          `-      "-.      \  
-     ;  /.'    ;          :;               ."        \      `,
-     :_:/      ::\        ;:     (        /   .-"   .')      ;
-       ;-"      ; "-.    /  ;           .^. .'    .' /    .-" 
-      /     .-  :    `. '.  : .- / __.-j.'.'   .-"  /.---'    
-     /  /      `,\.  .'   "":'  /-"   .'       \__.'          
-    :  :         ,\""       ; .'    .'      .-""              
-   _J  ;         ; `.      /.'    _/    \.-"                  
-  /  "-:        /"--.b-..-'     .'       ;                    
- /     /  ""-..'            .--'.-'/  ,  :                    
-:`.   :     / : bug         `-i" ,',_:  _ \                   
-:  \  '._  :__;             .'.-"; ; ; j `.l                  
- \  \          "-._         `"  :_/ :_/                       
-  `.;\             "-._                                       
-    :_"-._             "-.                                    
-      `.  l "-.     )     `.                                  
-        ""^--""^-. :        \                                 
-                  ";         \                                
-                  :           `._                             
-                  ; /    \ `._   ""---.                       
-                 / /   _      `.--.__.'                       
-                : :   / ;  :".  \                             
-                ; ;  :  :  ;  `. `.                           
-               /  ;  :   ; :    `. `.                         
-              /  /:  ;   :  ;     "-'                         
-             :_.' ;  ;    ; :                                 
-                 /  /     :_l                                 
-                 `-'
-'''
+# Cadena de texto de entrada
+cadena = 'si vgAuxi==7, entonces vgAuxi igual 1, sino leer libro. FinSi.'
+# Lista de tokens devuelta por Hannibal Lexer
+lista = [token[1] for token in lexer(cadena)]
+print('Cadena de tokens: ' + str(lista))
+main(lista, gramatica)
+
+# Cadena de texto de entrada
+cadena = 'función y(x): y equal (x * 2) + 3. Finfunción;\nz iqual y'
+# Lista de tokens devuelta por Hannibal Lexer
+lista = [token[1] for token in lexer(cadena)]
+print('Cadena de tokens: ' + str(lista))
+main(lista, gramatica)
+
+# Cadena de texto de entrada
+cadena = 'si vgAuxi igual 7, entonces vgAuxi == 1, sino mostrar demostración. FinSi.'
+# Lista de tokens devuelta por Hannibal Lexer
+lista = [token[1] for token in lexer(cadena)]
+print('Cadena de tokens: ' + str(lista))
+main(lista, gramatica)
+
+# Cadena de texto de entrada
+cadena = 'func y(x): leer y finfuncion; Repetir x equal x + 1 hasta x>=y.'
+# Lista de tokens devuelta por Hannibal Lexer
+lista = [token[1] for token in lexer(cadena)]
+print('Cadena de tokens: ' + str(lista))
+main(lista, gramatica)

@@ -69,30 +69,6 @@ def eliminarRecursividadIzquierda(gramatica):
     return gramaticaSRI
 
 
-# Función que factoriza una gramática
-# Hecha por github copilot
-def factorizar(gramatica):
-    # Se crea una copia de la gramática original
-    gramaticaF = {
-        'T': gramatica['T'], 'N': gramatica['N'], 'P': {}, 'S': gramatica['S']}
-    # No terminales: A1, A2, ..., An
-    n = len(gramatica['N'])
-    for i in range(0, n):
-        Ai = gramatica['N'][i]
-        gramaticaF['P'].update({Ai: []})
-        # Para cada producción Ai -> α1 | α2 | ... | αk
-        for derivacion in gramatica['P'][Ai]:
-            # Si α1 = α2 = ... = αk = λ
-            if derivacion == [λ]:
-                gramaticaF['P'][Ai].append(derivacion)
-            else:
-                # Si α1 = βγ1 y α2 = βγ2 y ... y αk = βγk
-                # Se factoriza la producción Ai -> βAi' y se agregan las producciones Ai' -> γ1 | γ2 | ... | γk
-                # gramaticaF['P'][Ai].append(derivacion)
-                pass
-    return gramaticaF
-
-
 # Gramática posta LL(1)
 gramatica = {
     # Terminales
@@ -100,67 +76,65 @@ gramatica = {
           mostrar, parentesisI, parentesisD, id, num, oprel, opsuma, opmult, pyc],
     # No terminales
     'N': ['Program', 'ListaSentencias', "ListaSentencias'", 'Sentencia', 'SentenciaSi', "SentenciaSi'", "SentenciaSi''", "SentenciaSi'''", 'SentenciaFun', 'SentenciaAsig',
-          'SentenciaLeer', 'SentenciaMostrar', 'Proc', 'ListaPar', "ListaPar'", 'Expresion', "Expresion'", 'Expresion2', "Expresion2'", 'Factor', 'Termino', "Termino'"],
+          'SentenciaLeer', 'SentenciaMostrar', 'SentenciaRepetir', 'Proc', 'ListaPar', "ListaPar'", 'Expresion', "Expresion'", 'Expresion2', "Expresion2'", 'Factor', 'Termino', "Termino'"],
     # Producciones
     'P': {
         'Program': [['ListaSentencias']],
-        'ListaSentencias': [[λ], ['Sentencia', "ListaSentencias'"]],
-        "ListaSentencias'": [[λ], [pyc, 'Sentencia']],
-        'Sentencia': [['SentenciaSi'], ['SentenciaFun'], ['SentenciaAsig'], ['SentenciaLeer'], ['SentenciaMostrar']],
-        'SentenciaSi': [["SentenciaSi'", 'ListaSentencias', finsi]],
-        "SentenciaSi'": [[si, 'Expresion', entonces, "SentenciaSi''"]],
-        "SentenciaSi''": [['Sentencia', "SentenciaSi'''"]],
-        "SentenciaSi'''": [[λ], [sino, 'Sentencia']],
+        'ListaSentencias': [['Sentencia', "ListaSentencias'"]],
+        "ListaSentencias'": [[λ], [pyc, 'Sentencia', "ListaSentencias'"]],
+        'Sentencia': [['SentenciaSi'], ['SentenciaFun'], ['SentenciaAsig'], ['SentenciaLeer'], ['SentenciaMostrar'], ['SentenciaRepetir']],
+        'SentenciaSi': [[si, 'Expresion', entonces, 'ListaSentencias', "SentenciaSi'"]],
+        "SentenciaSi'": [[sino, 'ListaSentencias', finsi], [finsi]],
         'SentenciaFun': [[func, 'Proc', finfunc]],
         'SentenciaAsig': [[id, equal, 'Expresion']],
         'SentenciaLeer': [[leer, id]],
         'SentenciaMostrar': [[mostrar, 'Expresion']],
+        'SentenciaRepetir': [[repetir, 'ListaSentencias', hasta, 'Expresion']],
         'Proc': [[id, parentesisI, 'ListaPar', parentesisD, 'ListaSentencias']],
         'ListaPar': [[id, "ListaPar'"]],
         "ListaPar'": [[λ], [pyc, id, "ListaPar'"]],
         'Expresion': [['Expresion2', "Expresion'"]],
         "Expresion'": [[λ], [oprel, 'Expresion2']],
         'Expresion2': [['Termino', "Expresion2'"]],
-        "Expresion2'": [[λ], [opsuma, 'Termino']],
+        "Expresion2'": [[λ], [opsuma, 'Termino', "Expresion2'"]],
         'Termino': [['Factor', "Termino'"]],
-        "Termino'": [[λ], [opmult, 'Factor']],
+        "Termino'": [[λ], [opmult, 'Factor', "Termino'"]],
         'Factor': [[parentesisI, 'Expresion', parentesisD], [id], [num]]
     },
     # Símbolo distinguido
     'S': 'Program'
 }
 
-# Gramática posta LL(1) con los terminales como texto (para pruebas)
+# Gramática posta LL(1) con los terminales como texto
 gramaticaSTR = {
     # Terminales
     'T': ['sino', 'si', 'entonces', 'func', 'finfunc', 'finsi', 'repetir', 'hasta', 'equal', 'leer',
           'mostrar', '(', ')', 'id', 'num', 'oprel', 'opsuma', 'opmult', ';'],
     # No terminales
     'N': ['Program', 'ListaSentencias', "ListaSentencias'", 'Sentencia', 'SentenciaSi', "SentenciaSi'", "SentenciaSi''", "SentenciaSi'''", 'SentenciaFun', 'SentenciaAsig',
-          'SentenciaLeer', 'SentenciaMostrar', 'Proc', 'ListaPar', "ListaPar'", 'Expresion', "Expresion'", 'Expresion2', "Expresion2'", 'Factor', 'Termino', "Termino'"],
+          'SentenciaLeer', 'SentenciaMostrar', 'SentenciaRepetir', 'Proc', 'ListaPar', "ListaPar'", 'Expresion', "Expresion'", 'Expresion2', "Expresion2'", 'Factor', 'Termino', "Termino'"],
     # Producciones
     'P': {
         'Program': [['ListaSentencias']],
         'ListaSentencias': [['Sentencia', "ListaSentencias'"]],
-        "ListaSentencias'": [[λ], [';', 'Sentencia']],
-        'Sentencia': [['SentenciaSi'], ['SentenciaFun'], ['SentenciaAsig'], ['SentenciaLeer'], ['SentenciaMostrar']],
-        'SentenciaSi': [["SentenciaSi'", 'ListaSentencias', 'finsi']],
-        "SentenciaSi'": [['si', 'Expresion', 'entonces', "SentenciaSi''"]],
-        "SentenciaSi''": [['Sentencia', "SentenciaSi'''"]],
-        "SentenciaSi'''": [[λ], ['sino', 'Sentencia']],
+        "ListaSentencias'": [[λ], [';', 'Sentencia', "ListaSentencias'"]],
+        'Sentencia': [['SentenciaSi'], ['SentenciaFun'], ['SentenciaAsig'], ['SentenciaLeer'], ['SentenciaMostrar'], ['SentenciaRepetir']],
+        'SentenciaSi': [['si', 'Expresion', 'entonces', 'ListaSentencias', "SentenciaSi'"]],
+        "SentenciaSi'": [['sino', 'ListaSentencias', 'finsi'], ['finsi']],
         'SentenciaFun': [['func', 'Proc', 'finfunc']],
         'SentenciaAsig': [['id', 'equal', 'Expresion']],
         'SentenciaLeer': [['leer', 'id']],
         'SentenciaMostrar': [['mostrar', 'Expresion']],
+        'SentenciaRepetir': [['repetir', 'ListaSentencias', 'hasta', 'Expresion']],
         'Proc': [['id', '(', 'ListaPar', ')', 'ListaSentencias']],
         'ListaPar': [['id', "ListaPar'"]],
         "ListaPar'": [[λ], [';', 'id', "ListaPar'"]],
         'Expresion': [['Expresion2', "Expresion'"]],
         "Expresion'": [[λ], ['oprel', 'Expresion2']],
         'Expresion2': [['Termino', "Expresion2'"]],
-        "Expresion2'": [[λ], ['opsuma', 'Termino']],
+        "Expresion2'": [[λ], ['opsuma', 'Termino', "Expresion2'"]],
         'Termino': [['Factor', "Termino'"]],
-        "Termino'": [[λ], ['opmult', 'Factor']],
+        "Termino'": [[λ], ['opmult', 'Factor', "Termino'"]],
         'Factor': [['(', 'Expresion', ')'], ['id'], ['num']]
     },
     # Símbolo distinguido
