@@ -1,10 +1,10 @@
-from Parser import simbolosDirectrices
 from gramaticas import gramaticaSTR
 from lexer import lexer
+from sd import SD
 
 
 def principal(lista, gramatica):
-  sd = simbolosDirectrices(gramatica)
+  sd = SD
   error = False
   t = 0
   def P(noTerminal):
@@ -25,7 +25,7 @@ def principal(lista, gramatica):
             P(xj)
             if error:
               break
-      if lista[t] in sd[noTerminal][i]:
+      if lista[t] in sd[noTerminal]:
         procesar(derivacion)
   P(gramatica['S'])
   if not error and lista[t] == '#':
@@ -35,6 +35,7 @@ def principal(lista, gramatica):
 
 
 cadena = 'si vgAuxi==7, entonces vgAuxi igual 1, sino leer libro. FinSi.'
+#print(lexer(cadena))
 lista = [token[1] for token in lexer(cadena)]
-print(lista)
+#print(lista)
 principal(lista, gramaticaSTR)

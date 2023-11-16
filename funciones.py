@@ -156,7 +156,7 @@ def esLL1(gramatica):
 # Pruebas
 
 
-print('Gramatica posta')
+""" print('Gramatica posta')
 print('Primeros')
 print(primeros(gramatica))
 print('Siguientes')
@@ -165,3 +165,4 @@ print('Simbolos directrices')
 print(simbolosDirectrices(gramatica))
 print('Es LL(1)')
 print(esLL1(gramatica))
+ """
